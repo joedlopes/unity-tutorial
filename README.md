@@ -6,6 +6,10 @@ This project is designed for beginners who are interested in Unity 3D developmen
 ## Chapters
 
 1. [C# For Unity](01-unity-basics/01_unity_csharp.md)
-1. [Unity: Base Objects and code](01-unity-basics/01_unity_csharp.md)
+2. [Unity: Base Objects and code](01-unity-basics/01_unity_csharp.md)
+2. [AR Foundation Framework: Introduction](02-ar-foundation-framework/01_ar_intro.md)
 
 
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
