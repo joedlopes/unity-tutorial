@@ -102,7 +102,7 @@ Now, when you run your AR application, a prefab object will be spawned on top of
 
 ## Example: Spawning and Selecting Object on Tracked Image
 
-In this example, we will create a script that spawns a prefab object on top of a tracked image and allows you to select it with a mouse tap.
+In this example, we will create a script that spawns a prefab object on top of a tracked image and allows you to select it with a tap.
 
 ### Step 1: Create the Prefab
 
@@ -189,9 +189,19 @@ Create a new C# script named `ScreenSpaceSelectInput` and attach it to the same 
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 
 public class ScreenSpaceSelectInput : MonoBehaviour
 {
+    [SerializeField]
+    XRInputValueReader<Vector2> m_TapStartPositionInput = new XRInputValueReader<Vector2>("Tap Start Position");
+
+    public XRInputValueReader<Vector2> tapStartPositionInput
+    {
+        get => m_TapStartPositionInput;
+        set => XRInputReaderUtility.SetInputProperty(ref m_TapStartPositionInput, value, this);
+    }
+
     private ARRaycastManager raycastManager;
 
     void Awake()
@@ -201,9 +211,9 @@ public class ScreenSpaceSelectInput : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (tapStartPositionInput.TryReadValue(out Vector2 tapPosition))
         {
-            HandleTap(Input.mousePosition);
+            HandleTap(tapPosition);
         }
     }
 
@@ -235,4 +245,4 @@ public class ScreenSpaceSelectInput : MonoBehaviour
 3. Drag the `ARTrackedImageManager` component to the `trackedImageManager` field in the `ARImageTracking` component.
 4. Ensure the `ScreenSpaceSelectInput` script is attached to the same GameObject.
 
-Now, when you run your AR application, a prefab object will be spawned on top of a tracked image, and you can select it with a mouse tap to change its color.
+Now, when you run your AR application, a prefab object will be spawned on top of a tracked image, and you can select it with a tap to change its color.

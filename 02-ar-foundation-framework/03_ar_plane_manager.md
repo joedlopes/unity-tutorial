@@ -80,92 +80,9 @@ Now, when you run your AR application, detected horizontal planes will be colore
 
 
 
-## Example: Spawning Items on Horizontal Planes
-
-In this example, we will create a script that spawns items in the middle of horizontal planes added to the scene. The user will be able to tap and select one of three items, and a message will be printed to the console when an item is selected.
-
-### Step 1: Create Item Prefabs
-
-1. Create three new GameObjects in your scene and name them `Item1`, `Item2`, and `Item3`.
-2. Customize these GameObjects to represent different items (e.g., different shapes or colors).
-3. Create prefabs from these GameObjects by dragging them into the `Assets` folder.
-
-### Step 2: Create AR Plane Item Spawner Script
-
-Create a new C# script named `ARPlaneItemSpawner` and attach it to the GameObject with the `ARPlaneManager` component.
-
-```csharp
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.XR.ARFoundation;
-using UnityEngine.XR.ARSubsystems;
-
-public class ARPlaneItemSpawner : MonoBehaviour
-{
-    public ARPlaneManager arPlaneManager;
-    public GameObject item1Prefab;
-    public GameObject item2Prefab;
-    public GameObject item3Prefab;
-
-    private List<GameObject> spawnedItems = new List<GameObject>();
-
-    void OnEnable()
-    {
-        arPlaneManager.planesChanged += OnPlanesChanged;
-    }
-
-    void OnDisable()
-    {
-        arPlaneManager.planesChanged -= OnPlanesChanged;
-    }
-
-    void OnPlanesChanged(ARPlanesChangedEventArgs args)
-    {
-        foreach (var plane in args.added)
-        {
-            if (plane.alignment == PlaneAlignment.HorizontalUp)
-            {
-                Vector3 spawnPosition = plane.center;
-                GameObject spawnedItem = Instantiate(item1Prefab, spawnPosition, Quaternion.identity);
-                spawnedItems.Add(spawnedItem);
-            }
-        }
-    }
-
-    void Update()
-    {
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began)
-            {
-                Ray ray = Camera.main.ScreenPointToRay(touch.position);
-                if (Physics.Raycast(ray, out RaycastHit hit))
-                {
-                    GameObject selectedItem = hit.transform.gameObject;
-                    if (spawnedItems.Contains(selectedItem))
-                    {
-                        Debug.Log($"{selectedItem.name} selected");
-                    }
-                }
-            }
-        }
-    }
-}
-```
-
-### Step 3: Assign Item Prefabs and AR Plane Manager
-
-1. In the Unity Editor, select the GameObject with the `ARPlaneManager` component.
-2. Assign the `Item1Prefab`, `Item2Prefab`, and `Item3Prefab` to the corresponding fields in the `ARPlaneItemSpawner` component.
-3. Drag the `ARPlaneManager` component to the `arPlaneManager` field in the `ARPlaneItemSpawner` component.
-
-Now, when you run your AR application, items will be spawned in the middle of detected horizontal planes. You can tap on these items to select them, and a message will be printed to the console indicating which item was selected.
-
-
 ## Example: Spawning Prefab on Detected Plane
 
-In this example, we will create a script that spawns a prefab object on top of a detected plane when the user taps on the screen.
+In this example, we will create a script that spawns a prefab object on top of a detected plane when the user taps on the screen using the XR Interaction Toolkit events.
 
 ### Step 1: Create the Prefab
 
@@ -181,15 +98,23 @@ Create a new C# script named `ARPlaneSpawner` and attach it to the GameObject wi
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
-using UnityEngine.XR.ARSubsystems;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 
 public class ARPlaneSpawner : MonoBehaviour
 {
+    [SerializeField]
+    XRInputValueReader<Vector2> m_TapStartPositionInput = new XRInputValueReader<Vector2>("Tap Start Position");
+
+    public XRInputValueReader<Vector2> tapStartPositionInput
+    {
+        get => m_TapStartPositionInput;
+        set => XRInputReaderUtility.SetInputProperty(ref m_TapStartPositionInput, value, this);
+    }
+
     public ARPlaneManager arPlaneManager;
     public GameObject spawnedObjectPrefab;
 
     private ARRaycastManager raycastManager;
-    private List<ARRaycastHit> hits = new List<ARRaycastHit>();
 
     void Awake()
     {
@@ -213,18 +138,19 @@ public class ARPlaneSpawner : MonoBehaviour
 
     void Update()
     {
-        if (Input.touchCount > 0)
+        if (tapStartPositionInput.TryReadValue(out Vector2 tapPosition))
         {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began)
-            {
-                Vector2 touchPosition = touch.position;
-                if (raycastManager.Raycast(touchPosition, hits, TrackableType.PlaneWithinPolygon))
-                {
-                    Pose hitPose = hits[0].pose;
-                    Instantiate(spawnedObjectPrefab, hitPose.position, hitPose.rotation);
-                }
-            }
+            HandleTap(tapPosition);
+        }
+    }
+
+    void HandleTap(Vector2 tapPosition)
+    {
+        List<ARRaycastHit> hits = new List<ARRaycastHit>();
+        if (raycastManager.Raycast(tapPosition, hits, UnityEngine.XR.ARSubsystems.TrackableType.PlaneWithinPolygon))
+        {
+            Pose hitPose = hits[0].pose;
+            Instantiate(spawnedObjectPrefab, hitPose.position, hitPose.rotation);
         }
     }
 }
@@ -235,5 +161,6 @@ public class ARPlaneSpawner : MonoBehaviour
 1. In the Unity Editor, select the GameObject with the `ARPlaneManager` component.
 2. Assign the `SpawnedObjectPrefab` to the corresponding field in the `ARPlaneSpawner` component.
 3. Drag the `ARPlaneManager` component to the `arPlaneManager` field in the `ARPlaneSpawner` component.
+4. Assign the `Tap Start Position` input action to the `Tap Start Position Input` field in the `ARPlaneSpawner` component.
 
-Now, when you run your AR application, a prefab object will be spawned on top of a detected plane when the user taps on the screen.
+Now, when you run your AR application, a prefab object will be spawned on top of a detected plane when the user taps on the screen using the XR Interaction Toolkit events.
