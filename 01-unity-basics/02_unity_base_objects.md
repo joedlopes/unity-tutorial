@@ -1833,20 +1833,20 @@ By using events in Unity, you can create more modular and maintainable code, all
 
 
 
-## Creating a GameController Object
+## Creating a GameManager Object
 
-In Unity, a GameController object is often used to manage the overall game state, including player scores, game settings, and other global data. To ensure that the GameController persists across different scenes, you can use the `DontDestroyOnLoad` method. This method prevents the GameObject from being destroyed when loading a new scene.
+In Unity, a GameManager object is often used to manage the overall game state, including player scores, game settings, and other global data. To ensure that the GameManager persists across different scenes, you can use the `DontDestroyOnLoad` method. This method prevents the GameObject from being destroyed when loading a new scene.
 
-### Creating the GameController Script
+### Creating the GameManager Script
 
-First, create a new script called `GameController`:
+First, create a new script called `GameManager`:
 
 ```csharp
 using UnityEngine;
 
-public class GameController : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
-    private static GameController instance;
+    private static GameManager instance;
 
     void Awake()
     {
@@ -1875,33 +1875,33 @@ public class GameController : MonoBehaviour
 
 ### Explanation
 
-1. **Singleton Pattern**: The `GameController` script uses the Singleton pattern to ensure that only one instance of the GameController exists. The `instance` variable holds the reference to the current instance of the GameController.
+1. **Singleton Pattern**: The `GameManager` script uses the Singleton pattern to ensure that only one instance of the GameManager exists. The `instance` variable holds the reference to the current instance of the GameManager.
 
-2. **Awake Method**: In the `Awake` method, the script checks if an instance of the GameController already exists. If not, it sets the `instance` to the current object and calls `DontDestroyOnLoad` to prevent it from being destroyed when loading a new scene. If an instance already exists, it destroys the current object to maintain a single instance.
+2. **Awake Method**: In the `Awake` method, the script checks if an instance of the GameManager already exists. If not, it sets the `instance` to the current object and calls `DontDestroyOnLoad` to prevent it from being destroyed when loading a new scene. If an instance already exists, it destroys the current object to maintain a single instance.
 
-3. **OnDestroy Method**: The `OnDestroy` method sets the `instance` to null if the current instance is being destroyed. This ensures that the reference is cleared when the GameController is destroyed.
+3. **OnDestroy Method**: The `OnDestroy` method sets the `instance` to null if the current instance is being destroyed. This ensures that the reference is cleared when the GameManager is destroyed.
 
-### Adding the GameController to the Scene
+### Adding the GameManager to the Scene
 
-1. Create an empty GameObject in your scene and name it `GameController`.
-2. Attach the `GameController` script to the `GameController` GameObject.
+1. Create an empty GameObject in your scene and name it `GameManager`.
+2. Attach the `GameManager` script to the `GameManager` GameObject.
 
-By following these steps, you can create a GameController object that persists across different scenes, ensuring that your game state and global data are maintained throughout the game.
+By following these steps, you can create a GameManager object that persists across different scenes, ensuring that your game state and global data are maintained throughout the game.
 
-### Example: GameController for Scene Management and Task Completion
+### Example: GameManager for Scene Management and Task Completion
 
-Here is an example of a `GameController` that changes scenes, checks if the player has completed all tasks, and then changes the scene again. When the game ends, it shows the final scene and updates the final score using TextMeshPro.
+Here is an example of a `GameManager` that changes scenes, checks if the player has completed all tasks, and then changes the scene again. When the game ends, it shows the final scene and updates the final score using TextMeshPro.
 
-#### GameController Script
+#### GameManager Script
 
 ```csharp
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
-public class GameController : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
-    private static GameController instance;
+    private static GameManager instance;
     public TextMeshProUGUI finalScoreText;
     private int playerScore = 0;
     private int totalTasks = 5;
@@ -1974,9 +1974,9 @@ public class GameController : MonoBehaviour
 
 1. **Initial Scene**: Set up tasks and call `CompleteTask` when each task is completed.
 2. **Next Scene**: Continue the game or tasks, and call `EndGame` when ready to end the game.
-3. **Final Scene**: Add a TextMeshProUGUI component to display the final score and assign it to the `finalScoreText` field in the `GameController`.
+3. **Final Scene**: Add a TextMeshProUGUI component to display the final score and assign it to the `finalScoreText` field in the `GameManager`.
 
-By using this `GameController`, you can manage scene transitions, track task completion, and display the final score in your Unity game.
+By using this `GameManager`, you can manage scene transitions, track task completion, and display the final score in your Unity game.
 
 
 
@@ -2254,7 +2254,6 @@ For simple cases where you only need to destroy a GameObject after a fixed delay
 By understanding and using the `Destroy` method and coroutines, you can effectively manage the lifecycle of GameObjects in your Unity projects, ensuring that resources are freed up and your game runs smoothly.
 
 
-
 ## UI Button in Unity
 
 The UI Button component in Unity allows you to create interactive buttons in your game's user interface. You can add events to the button's `OnClick` event via code to perform actions when the button is clicked.
@@ -2312,3 +2311,237 @@ public class ButtonClickExample : MonoBehaviour
 2. **Run the Scene**: When you run the scene and click the button, the `OnButtonClick` method will be called, and "Button clicked!" will be logged to the console.
 
 By using the `Button` component and adding `OnClick` events via code, you can create interactive and dynamic user interfaces in your Unity games, enhancing the overall player experience.
+
+
+## Playing Audio in Unity Using MonoBehaviour
+
+Playing audio in Unity can be easily achieved using the `AudioSource` component along with a `MonoBehaviour` script. The `AudioSource` component is responsible for playing back audio clips in the scene.
+
+### Adding an AudioSource Component
+
+To add an `AudioSource` component to a GameObject:
+1. Select the GameObject in the Hierarchy window.
+2. Click on `Add Component` in the Inspector window.
+3. Search for `AudioSource` and add it.
+
+### Playing Audio via Script
+
+To play audio using a `MonoBehaviour` script, follow these steps:
+
+1. **Create a Script**: Create a new C# script or use an existing one.
+2. **Declare an AudioSource Variable**: Add a public variable to hold a reference to the `AudioSource` component.
+3. **Play the Audio**: Use the `Play` method to play the audio clip.
+
+#### Example Script
+
+Here is an example script that demonstrates how to play an audio clip when the player presses a key:
+
+```csharp
+using UnityEngine;
+
+public class AudioPlayer : MonoBehaviour
+{
+    public AudioSource audioSource; // Reference to the AudioSource component
+
+    void Start()
+    {
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            PlayAudio();
+        }
+    }
+
+    void PlayAudio()
+    {
+        if (audioSource != null && !audioSource.isPlaying)
+        {
+            audioSource.Play();
+        }
+    }
+}
+```
+
+### Explanation
+
+1. **AudioSource Variable**: The `audioSource` variable is a public `AudioSource` that holds a reference to the `AudioSource` component. You can assign the `AudioSource` component to this variable in the Unity Editor or get it in the `Start` method.
+
+2. **Play Method**: The `Play` method is used to start playing the audio clip assigned to the `AudioSource` component.
+
+3. **Input Check**: The `Update` method checks if the player presses the "P" key (`KeyCode.P`). If the key is pressed, the `PlayAudio` method is called.
+
+4. **PlayAudio Method**: This method checks if the `AudioSource` is not null and is not already playing, then plays the audio clip.
+
+### Example Usage
+
+1. **Assign the AudioSource**: In the Unity Editor, assign the `AudioSource` component to the `audioSource` variable in the `AudioPlayer` script.
+2. **Assign an Audio Clip**: Assign an audio clip to the `AudioSource` component.
+3. **Run the Scene**: When you run the scene and press the "P" key, the audio clip will play.
+
+By using the `AudioSource` component and a `MonoBehaviour` script, you can easily play audio in your Unity games, enhancing the overall player experience with sound effects and music.
+
+
+### Another Example: Playing Different Sounds in Alarm Zones
+
+In this example, we will use the `OnTriggerEnter` method to play different sounds when the player enters different alarm zones. Each alarm zone will have a unique sound associated with it.
+
+#### Step 1: Create the AlarmZone Script
+
+Create a new script called `AlarmZone` and add the following code:
+
+```csharp
+using UnityEngine;
+
+public class AlarmZone : MonoBehaviour
+{
+    public AudioClip alarmSound; // Reference to the alarm sound
+    private AudioSource audioSource;
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            PlayAlarmSound();
+        }
+    }
+
+    void PlayAlarmSound()
+    {
+        if (alarmSound != null)
+        {
+            audioSource.clip = alarmSound;
+            audioSource.Play();
+        }
+    }
+}
+```
+
+#### Step 2: Set Up the Alarm Zones
+
+1. Create multiple GameObjects in your scene to act as alarm zones.
+2. Add a `Collider` component to each alarm zone and set it as a trigger.
+3. Attach the `AlarmZone` script to each alarm zone.
+4. Assign a unique `AudioClip` to the `alarmSound` field of each `AlarmZone` script in the Unity Editor.
+
+#### Step 3: Tag the Player
+
+Ensure that the player GameObject has the tag "Player". You can set this in the Inspector window by selecting the player GameObject and choosing "Player" from the Tag dropdown.
+
+### Example Usage
+
+When the player enters an alarm zone, the `OnTriggerEnter` method will be called, and the corresponding alarm sound will play.
+
+By using the `OnTriggerEnter` method and the `AudioSource` component, you can create interactive alarm zones in your Unity game that play different sounds based on the player's location.
+
+
+## Debug Messages in Unity
+
+The `Debug` class in Unity is a powerful tool for logging messages, warnings, and errors to the Unity Console. It is essential for debugging and diagnosing issues in your game during development.
+
+### Key Functions of the Debug Class
+
+#### Debug.Log
+
+The `Debug.Log` function is used to log general messages to the Unity Console. It is useful for displaying information about the state of your game or the values of variables.
+
+```csharp
+Debug.Log("This is a log message.");
+```
+
+#### Debug.LogWarning
+
+The `Debug.LogWarning` function is used to log warning messages to the Unity Console. Warnings indicate potential issues that are not necessarily errors but could lead to problems.
+
+```csharp
+Debug.LogWarning("This is a warning message.");
+```
+
+#### Debug.LogError
+
+The `Debug.LogError` function is used to log error messages to the Unity Console. Errors indicate serious issues that need to be addressed.
+
+```csharp
+Debug.LogError("This is an error message.");
+```
+
+#### Debug.Assert
+
+The `Debug.Assert` function is used to check for conditions that should always be true. If the condition is false, an error message is logged. This is useful for validating assumptions in your code.
+
+```csharp
+Debug.Assert(myVariable != null, "myVariable should not be null.");
+```
+
+#### Debug.DrawLine
+
+The `Debug.DrawLine` function is used to draw a line between two points in the Scene view. This is useful for visualizing paths, directions, or distances during development.
+
+```csharp
+Debug.DrawLine(Vector3.zero, new Vector3(1, 1, 1), Color.red);
+```
+
+#### Debug.Break
+
+The `Debug.Break` function pauses the editor when running in Play mode. This is useful for stopping the game at a specific point to inspect the state of your game.
+
+```csharp
+Debug.Break();
+```
+
+### Example Usage
+
+Here is an example script that demonstrates the use of various `Debug` functions:
+
+```csharp
+using UnityEngine;
+
+public class DebugExample : MonoBehaviour
+{
+    void Start()
+    {
+        Debug.Log("Game started.");
+
+        int score = 10;
+        if (score < 0)
+        {
+            Debug.LogWarning("Score is less than zero.");
+        }
+
+        GameObject player = GameObject.Find("Player");
+        Debug.Assert(player != null, "Player object should exist.");
+
+        if (player == null)
+        {
+            Debug.LogError("Player object not found.");
+        }
+
+        Debug.DrawLine(Vector3.zero, new Vector3(1, 1, 1), Color.green);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Break();
+        }
+    }
+}
+```
+
+By using the `Debug` class, you can effectively log messages, warnings, and errors, as well as visualize and inspect the state of your game during development, making it easier to identify and fix issues.

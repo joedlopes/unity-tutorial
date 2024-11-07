@@ -478,3 +478,7 @@ public class ImageTrackingHandler : MonoBehaviour
 2. **Interact with AR**: Point your device's camera at the images you added to the reference image library to see the tracking in action.
 
 By following these steps, you can effectively detect and track markers or images using the AR Foundation Image Tracking system, enhancing your AR application with image-based interactions.
+
+
+
+
