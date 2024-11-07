@@ -373,3 +373,97 @@ By following these steps, you have created a simple AR application that handles 
 
 
 
+## Example
+
+```csharp
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
+
+public class TapBoxCreator : MonoBehaviour
+{
+    [SerializeField]
+    XRInputValueReader<Vector2> m_TapStartPositionInput = new XRInputValueReader<Vector2>("Tap Start Position");
+
+    public XRInputValueReader<Vector2> tapStartPositionInput
+    {
+        get => m_TapStartPositionInput;
+        set => XRInputReaderUtility.SetInputProperty(ref m_TapStartPositionInput, value, this);
+    }
+
+    public ARPlaneManager arPlaneManager;
+    public GameObject spawnedObjectPrefab;
+
+    private ARRaycastManager raycastManager;
+    private bool isRaycastManagerInitialized = false;
+
+    void Awake()
+    {
+        raycastManager = GetComponent<ARRaycastManager>();
+        if (raycastManager != null)
+        {
+            isRaycastManagerInitialized = true;
+        }
+        else
+        {
+            Debug.LogError("ARRaycastManager component is missing. Please attach it to the GameObject.");
+        }
+    }
+
+    void OnEnable()
+    {
+        if (arPlaneManager != null)
+        {
+            arPlaneManager.planesChanged += OnPlanesChanged;
+        }
+        else
+        {
+            Debug.LogError("ARPlaneManager is not set. Please assign it in the Inspector.");
+        }
+    }
+
+    void OnDisable()
+    {
+        if (arPlaneManager != null)
+        {
+            arPlaneManager.planesChanged -= OnPlanesChanged;
+        }
+    }
+
+    void OnPlanesChanged(ARPlanesChangedEventArgs args)
+    {
+        // Handle plane changes if needed
+    }
+
+    void Update()
+    {
+        if (tapStartPositionInput != null && tapStartPositionInput.TryReadValue(out Vector2 tapPosition))
+        {
+            HandleTap(tapPosition);
+        }
+    }
+
+    void HandleTap(Vector2 tapPosition)
+    {
+        if (!isRaycastManagerInitialized)
+        {
+            Debug.LogError("ARRaycastManager is not initialized.");
+            return;
+        }
+
+        List<ARRaycastHit> hits = new List<ARRaycastHit>();
+        if (raycastManager.Raycast(tapPosition, hits, UnityEngine.XR.ARSubsystems.TrackableType.PlaneWithinPolygon))
+        {
+            Pose hitPose = hits[0].pose;
+            Instantiate(spawnedObjectPrefab, hitPose.position, hitPose.rotation);
+        }
+        else
+        {
+            Debug.Log("No plane hit detected at tap position.");
+        }
+    }
+}
+
+```
