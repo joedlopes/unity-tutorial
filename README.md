@@ -7,9 +7,9 @@ This project is designed for beginners who are interested in Unity 3D developmen
 
 🚀 Basic Chapters:
 1. [C# For Unity](01-unity-basics/01_unity_csharp.md)
-2. [Unity: Base Objects and Components](01-unity-basics/01_unity_csharp.md)
+2. [Unity: Base Objects and Components](01-unity-basics/02_unity_base_objects.md)
 3. [Unity: MonoBehavior](01-unity-basics/03_monobehavior.md)
-4. [Unity: Script and Component Properties](01-unity-basics/04_component_properties.md.md)
+4. [Unity: Script and Component Properties](01-unity-basics/04_component_properties.md)
 5. [State Machines](01-unity-basics/05_state_machine.md)
 6. [Input System](01-unity-basics/06_input_system.md)
 6. [Using VS Code as Code Editor](01-unity-basics/07_unity_with_vscode.md)
