@@ -80,7 +80,7 @@ Now, when you run your AR application, detected horizontal planes will be colore
 
 
 
-## Example: Spawning Prefab on Detected Plane
+## Example 1: Spawning Prefab on Detected Planes
 
 In this example, we will create a script that spawns a prefab object on top of a detected plane when the user taps on the screen using the XR Interaction Toolkit events.
 
@@ -156,6 +156,7 @@ public class ARPlaneSpawner : MonoBehaviour
 }
 ```
 
+
 ### Step 3: Assign Prefab and AR Plane Manager
 
 1. In the Unity Editor, select the GameObject with the `ARPlaneManager` component.
@@ -164,3 +165,115 @@ public class ARPlaneSpawner : MonoBehaviour
 4. Assign the `Tap Start Position` input action to the `Tap Start Position Input` field in the `ARPlaneSpawner` component.
 
 Now, when you run your AR application, a prefab object will be spawned on top of a detected plane when the user taps on the screen using the XR Interaction Toolkit events.
+
+
+
+## Example 2: Instantianting Single Object at the time
+
+If you ran the previous example, you might have noticed that multiple boxes were instantiated with each tap. In this example, we will fix this by adding a `isTapHeld` variable (`bool`) to check whether the tap action is pressed or not.
+
+
+```csharp
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
+
+public class TapBoxCreator : MonoBehaviour
+{
+    [SerializeField]
+    XRInputValueReader<Vector2> m_TapStartPositionInput = new XRInputValueReader<Vector2>("Tap Start Position");
+
+    public XRInputValueReader<Vector2> tapStartPositionInput
+    {
+        get => m_TapStartPositionInput;
+        set => XRInputReaderUtility.SetInputProperty(ref m_TapStartPositionInput, value, this);
+    }
+
+    public ARPlaneManager arPlaneManager;
+    public GameObject spawnedObjectPrefab;
+
+    private ARRaycastManager raycastManager;
+    private bool isRaycastManagerInitialized = false;
+    private bool isTapHeld = false;
+
+    void Awake()
+    {
+        raycastManager = GetComponent<ARRaycastManager>();
+        if (raycastManager != null)
+        {
+            isRaycastManagerInitialized = true;
+        }
+        else
+        {
+            Debug.LogError("ARRaycastManager component is missing. Please attach it to the GameObject.");
+        }
+    }
+
+    void OnEnable()
+    {
+        if (arPlaneManager != null)
+        {
+            arPlaneManager.planesChanged += OnPlanesChanged;
+        }
+        else
+        {
+            Debug.LogError("ARPlaneManager is not set. Please assign it in the Inspector.");
+        }
+    }
+
+    void OnDisable()
+    {
+        if (arPlaneManager != null)
+        {
+            arPlaneManager.planesChanged -= OnPlanesChanged;
+        }
+    }
+
+    void OnPlanesChanged(ARPlanesChangedEventArgs args)
+    {
+        // Handle plane changes if needed
+    }
+
+    void Update()
+    {
+        if (tapStartPositionInput != null)
+        {
+            if (tapStartPositionInput.TryReadValue(out Vector2 tapPosition))
+            {
+                if (!isTapHeld)
+                {
+                    HandleTap(tapPosition);
+                    isTapHeld = true;
+                }
+            }
+            else if (isTapHeld)
+            {
+                // Reset when the tap is released
+                isTapHeld = false;
+            }
+        }
+    }
+
+    void HandleTap(Vector2 tapPosition)
+    {
+        if (!isRaycastManagerInitialized)
+        {
+            Debug.LogError("ARRaycastManager is not initialized.");
+            return;
+        }
+
+        List<ARRaycastHit> hits = new List<ARRaycastHit>();
+        if (raycastManager.Raycast(tapPosition, hits, UnityEngine.XR.ARSubsystems.TrackableType.PlaneWithinPolygon))
+        {
+            Pose hitPose = hits[0].pose;
+            Instantiate(spawnedObjectPrefab, hitPose.position, hitPose.rotation);
+        }
+        else
+        {
+            Debug.Log("No plane hit detected at tap position.");
+        }
+    }
+}
+```
