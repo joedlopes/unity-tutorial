@@ -194,13 +194,12 @@ public class TapBoxCreator : MonoBehaviour
     public ARPlaneManager arPlaneManager;
     public GameObject spawnedObjectPrefab;
 
-    private ARRaycastManager raycastManager;
+    public ARRaycastManager raycastManager;
     private bool isRaycastManagerInitialized = false;
     private bool isTapHeld = false;
 
     void Awake()
     {
-        raycastManager = GetComponent<ARRaycastManager>();
         if (raycastManager != null)
         {
             isRaycastManagerInitialized = true;
@@ -268,12 +267,22 @@ public class TapBoxCreator : MonoBehaviour
         if (raycastManager.Raycast(tapPosition, hits, UnityEngine.XR.ARSubsystems.TrackableType.PlaneWithinPolygon))
         {
             Pose hitPose = hits[0].pose;
-            Instantiate(spawnedObjectPrefab, hitPose.position, hitPose.rotation);
+            GameObject spawnedObject = Instantiate(spawnedObjectPrefab, hitPose.position, hitPose.rotation);
+
+            // Adjust the position and orientation to ensure the cube is aligned with the plane
+            Renderer objectRenderer = spawnedObject.GetComponent<Renderer>();
+            if (objectRenderer != null)
+            {
+                float objectHeight = objectRenderer.bounds.size.y;
+                spawnedObject.transform.position += hitPose.up * (objectHeight / 2);
+                spawnedObject.transform.rotation = Quaternion.FromToRotation(Vector3.up, hitPose.up) * hitPose.rotation;
+            }
         }
         else
         {
             Debug.Log("No plane hit detected at tap position.");
         }
     }
+    
 }
 ```
