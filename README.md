@@ -19,6 +19,7 @@ This project is designed for beginners who are interested in Unity 3D developmen
 2. [AR Controls using XR Interaction Toolkit](02-ar-foundation-framework/02_xr_interation_ar_controls.md)
 3. [AR Plane Manager: Introduction and Examples](02-ar-foundation-framework/03_ar_plane_manager.md)
 4. [AR Image Tracking: Introduction and Examples](02-ar-foundation-framework/04_ar_image_tracking.md)
+5. [AR Animated Character: Example of character control using touching (tap)](02-ar-foundation-framework/05_ar_tap_character_controller.md)
 
 
 ## Join Our Discord Server
