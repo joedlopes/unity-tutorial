@@ -1907,6 +1907,11 @@ public class GameManager : MonoBehaviour
     private int totalTasks = 5;
     private int completedTasks = 0;
 
+    public static GameManager Instance()
+    {
+        return instance;
+    }
+
     void Awake()
     {
         if (instance == null)
